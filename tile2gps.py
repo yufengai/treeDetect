@@ -18,12 +18,16 @@ def parse_args():
   parser.add_argument('--npy_file_path',dest = 'npy_file_path',help='npy file path',
             default='.\\npy', type=str)
 
+
   if len(sys.argv) == 1:
     parser.print_help()
     sys.exit(1)
 
+
   args = parser.parse_args()
   return args
+
+
 #output every pixel deg in tile
 def num2deg(xtile, ytile,xpixel,ypixel, zoom):
   n = 2.0 ** zoom
