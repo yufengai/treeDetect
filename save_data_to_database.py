@@ -3,6 +3,14 @@ import pymysql
 import datetime
 import time
 import sys, getopt
+import logging
+# 单例模式
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s %(name)s %(filename)s %(funcName)s  %(levelname)s %(message)s",
+                    datefmt='%Y-%m-%d  %H:%M:%S %a'    #注意月份和天数不要搞乱了，这里的格式化符与time模块相同
+                    )
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def data_to_list(data_dir):
@@ -26,16 +34,16 @@ def data_to_list(data_dir):
             last_batch_id = int(last_batch_id) + 1
         else:
             last_batch_id = 1
-    except:
-        print("wrong !")
+    except Exception as e:
+        logger.error("Wrong !", e)
     finally:
         cursor.close()
         db.close()
-    print(last_batch_id)
+    # print(last_batch_id)
     # last_batch_id = 0
     curr_time = str(datetime.datetime.now())
     # curr_time = str('2019-08-15 09:03:30')
-    print(curr_time)
+    # print(curr_time)
     for i in range(len(data)):
         data_list[i][0] = last_batch_id
         data_list[i][1: 8] = data[i]
@@ -77,17 +85,20 @@ def insert_data(data_list, last_batch_id):
 
     try:
 
-        print(len(data_list))
+        # print(len(data_list))
+        logger.info("do insert batch data in id:= %s", last_batch_id)
         cursor.executemany(sql_str, data_list)
         db.commit()
-        sql_update = "update tree_location set tree_point = st_GeomFromText(CONCAT('POINT(',latitude,' ',longitude,')'))  where batch_id=" + str(last_batch_id)
+        logger.info("do update batch data in id:= %s", last_batch_id)
+        sql_update = "update tree_location set tree_point = st_GeomFromText(CONCAT('POINT(',longitude,' ',latitude,')'))  " \
+                     "where batch_id=" + str(last_batch_id)
         cursor.execute(sql_update)
         db.commit()
 
 
 
     except Exception as e:
-        print("Wrong! Do rollback!", e)
+        logger.error("Wrong! Do rollback!", e)
         db.rollback()
     finally:
         cursor.close()
