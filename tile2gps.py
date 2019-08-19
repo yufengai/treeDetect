@@ -17,7 +17,7 @@ def parse_args():
                       default='/home/data/merged/724/GPSData.txt', type=str)
   parser.add_argument('--out_npy', dest='out_npy', help='lat and lon result file name',
                       default='/home/data/merged/724/list.npy', type=str)
-  parser.add_argument('--npy_file_path', dest='npy_file_path', help='npy file path',
+  parser.add_argument('--npy_file_path', dest='npy_file_path', help='merger pic gen npy file path',
             default='/home/data/merged/724/npy/', type=str)
 
 
@@ -152,6 +152,11 @@ def _tiletogps():
                 lat_deg, lon_deg = num2deg(xtile, ytile, 0, 0, zoom=21)
                 lst.append([xtile, ytile, 21, abs(lat_deg), abs(lon_deg), 0, 0])
     return lst
+
+
+def gen_gps_npy(conf):
+    lst = gen_gps(conf.get('result_txt_path'), conf.get('z_tile'))
+    np.save(conf.get('result_lat_lon_npy_path'), lst)
 
 
 if __name__ == '__main__':

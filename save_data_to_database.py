@@ -17,7 +17,7 @@ def data_to_list(data_dir):
     data = np.load(data_dir)
     data_list = [[0 for a in range(10)] for b in range(len(data))]
     db = pymysql.connect(
-        host='47.97.155.10 ',
+        host='47.97.155.10',
         port=3388,
         user='ai',
         password='VqMxFAyQ@123',
@@ -90,12 +90,10 @@ def insert_data(data_list, last_batch_id):
         cursor.executemany(sql_str, data_list)
         db.commit()
         logger.info("do update batch data in id:= %s", last_batch_id)
-        sql_update = "update tree_location set tree_point = st_GeomFromText(CONCAT('POINT(',longitude,' ',latitude,')'))  " \
+        sql_update = "update tree_location set tree_point = st_GeomFromText(CONCAT('POINT(',latitude,' ',longitude,')'))  " \
                      "where batch_id=" + str(last_batch_id)
         cursor.execute(sql_update)
         db.commit()
-
-
 
     except Exception as e:
         logger.error("Wrong! Do rollback!", e)
@@ -105,8 +103,14 @@ def insert_data(data_list, last_batch_id):
         db.close()
 
 
+def save2database(conf):
+    path = conf.get('result_lat_lon_npy_path')
+    data_list, batch_id = data_to_list(path)
+    insert_data(data_list, batch_id)
+
+
 def main(argv):
-    dir = '/home/data/tree/merged/724/list.npy'
+    dir = '/home/data/list.npy'
     # try:
     #     opts, args = getopt.getopt(argv, "hd:", ["dir_name=", ])
     # except getopt.GetoptError:

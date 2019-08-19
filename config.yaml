@@ -1,0 +1,20 @@
+
+CUDA_VISIBLE_DEVICES: (0,)
+# 1. merger tiles
+tiles_path: /tmp
+x_tiles_nums: 8
+y_tiles_nums: 8
+x_tile_size: 256
+y_tile_size: 256
+merge_pic_path: /
+merge_npy_path: /
+z_tile: 21
+
+# 2. infer para
+weight_path: /
+conf_path: /
+faster_rcnn_cmd_path: /
+# 3. tile2gps para
+result_txt_path: /
+result_lat_lon_npy_path: /
+result_lat_lon_txt_path: /
