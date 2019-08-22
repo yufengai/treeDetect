@@ -1,0 +1,28 @@
+
+conda_env: maskrcnn
+# 1. merger tiles
+tiles_path: /home/data/tree/tile/0722/
+data_root: /tmp/detect_result_tree/
+x_tiles_nums: 8
+y_tiles_nums: 8
+x_tile_size: 256
+y_tile_size: 256
+merge_pic_path: /home/data/tree/tile/0722/out/pic/
+merge_npy_path: /home/data/tree/tile/0722/out/npy/
+merge_txt_path: /home/data/tree/tile/0722/out/txt/
+# todo 需要覆写
+z_tile: 21
+
+# 2. infer para
+CUDA_VISIBLE_DEVICES: 1
+weight_path: /home/yufeng/test-faster-rcnn/output/res101/voc_2007_trainval/default/res101_faster_rcnn_iter_190000.ckpt
+conf_path: experiments/cfgs/res101.yml
+faster_rcnn_cmd_path: /home/yufeng/test-faster-rcnn/
+stonebone: res101
+dataset_name_path: /home/data/tree/tile/0722/out/pic/
+
+# 3. tile2gps para
+result_txt_path: /tmp/test_tree.txt
+result_lat_lon_npy_path: /home/data/tree/tile/0722/result_gps.npy
+result_lat_lon_txt_path: /home/data/tree/tile/0722/result_gps.txt
+batch: 0

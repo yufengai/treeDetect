@@ -32,7 +32,7 @@ class labelme2coco(object):
     def data_transfer(self):
         #
         for num,json_file in enumerate(self.labelme_json):
-            print num,json_file
+            print(num,json_file)
             with open(json_file,'r') as fp:
                 data = json.load(fp, encoding="gb18030")  # 加载json文件
                 self.images.append(self.image(data,num))
@@ -157,7 +157,7 @@ if __name__ == '__main__':
         labelme_json=glob.glob('/home/yufeng/detectron/detectron/detectron/datasets/data/coco/origin/*.json')
         # labelme_json=['./1.json']
 
-        labelme2coco(labelme_json,'./new2.json')
+        labelme2coco(labelme_json, './new2.json')
     else:
         labelme_json=glob.glob(args.src + "*.json")
 
