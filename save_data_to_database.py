@@ -4,60 +4,66 @@ import datetime
 import time
 import sys, getopt
 import logging
+
 # 单例模式
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s %(name)s %(filename)s %(funcName)s  %(levelname)s %(message)s",
-                    datefmt='%Y-%m-%d  %H:%M:%S %a'    #注意月份和天数不要搞乱了，这里的格式化符与time模块相同
+                    datefmt='%Y-%m-%d  %H:%M:%S %a'  # 注意月份和天数不要搞乱了，这里的格式化符与time模块相同
                     )
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def data_to_list(data_dir):
-    data = np.load(data_dir)
-    data_list = [[0 for a in range(10)] for b in range(len(data))]
-    db = pymysql.connect(
-        host='47.97.155.10',
-        port=3388,
-        user='ai',
-        password='VqMxFAyQ@123',
-        db='data_warehouse',
-        charset='utf8',
-    )
-    try:
-        cursor = db.cursor()
-        cursor.execute('SELECT batch_id FROM tree_location group by batch_id ORDER BY batch_id DESC LIMIT 1')
-        db.commit()
-        last_batch_id = cursor.fetchall()
-        if last_batch_id:
-            last_batch_id = last_batch_id[0][0]
-            last_batch_id = int(last_batch_id) + 1
-        else:
-            last_batch_id = 1
-    except Exception as e:
-        logger.error("Wrong !", e)
-    finally:
-        cursor.close()
-        db.close()
+def data_to_list(data_dir, last_batch_id):
+    # db = pymysql.connect(
+    #     host='47.97.155.10',
+    #     port=3388,
+    #     user='ai',
+    #     password='VqMxFAyQ@123',
+    #     db='data_warehouse',
+    #     charset='utf8',
+    # )
+    # try:
+    #     cursor = db.cursor()
+    #     cursor.execute('SELECT batch_id FROM tree_location group by batch_id ORDER BY batch_id DESC LIMIT 1')
+    #     db.commit()
+    #     last_batch_id = cursor.fetchall()
+    #     if last_batch_id:
+    #         last_batch_id = last_batch_id[0][0]
+    #         last_batch_id = int(last_batch_id) + 1
+    #     else:
+    #         last_batch_id = 1
+    # except Exception as e:
+    #     logger.error("Wrong !", e)
+    # finally:
+    #     cursor.close()
+    #     db.close()
     # print(last_batch_id)
     # last_batch_id = 0
     curr_time = str(datetime.datetime.now())
     # curr_time = str('2019-08-15 09:03:30')
     # print(curr_time)
+    data = np.load(data_dir, allow_pickle=True)
+    data_list = [[0 for _ in range(10)] for _ in range(len(data))]
     for i in range(len(data)):
+        pic_no = data[i][-1]
+        # if pic_no != '000001':
+        #     continue
         data_list[i][0] = last_batch_id
         data_list[i][1: 8] = data[i]
         data_list[i][8] = curr_time
         # data_list[i][8] = str(1)
         data_list[i][9] = 0
+
+        data_list[i][10] = pic_no
         for j in range(3):
             data_list[i][j + 1] = int(data_list[i][j + 1])
         for k in range(4):
             data_list[i][k + 4] = float(data_list[i][k + 4])
-    for i,d in enumerate(data_list):
+    for i, d in enumerate(data_list):
         data_list[i] = tuple(d)
 
-    return data_list, last_batch_id
+    return data_list
 
 
 def insert_data(data_list, last_batch_id):
@@ -80,8 +86,9 @@ def insert_data(data_list, last_batch_id):
               '`length`     , ' \
               '`width`      , ' \
               '`create_time`, ' \
-              '`from`       )'\
-              'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s )'
+              '`from` ,       ' \
+              '`pic_no`) ' \
+              'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s ,%s)'
 
     try:
 
@@ -105,12 +112,12 @@ def insert_data(data_list, last_batch_id):
 
 def save2database(conf):
     path = conf.get('result_lat_lon_npy_path')
-    data_list, batch_id = data_to_list(path)
-    insert_data(data_list, batch_id)
+    data_list = data_to_list(path, conf['batch'])
+    insert_data(data_list, conf['batch'])
 
 
 def main(argv):
-    dir = '/home/data/list.npy'
+    dir = '/tmp/detect_result_tree/5/result_gps.npy'
     # try:
     #     opts, args = getopt.getopt(argv, "hd:", ["dir_name=", ])
     # except getopt.GetoptError:
