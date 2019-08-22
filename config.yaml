@@ -1,20 +1,27 @@
 
-CUDA_VISIBLE_DEVICES: (0,)
+conda_env: maskrcnn
 # 1. merger tiles
-tiles_path: /tmp
+tiles_path: /home/data/tree/tile/0722/  # from mysql get para
+data_root: /tmp/detect_result_tree/
 x_tiles_nums: 8
 y_tiles_nums: 8
 x_tile_size: 256
 y_tile_size: 256
-merge_pic_path: /
-merge_npy_path: /
+merge_pic_path: out/pic/
+merge_npy_path: out/npy/
+merge_txt_path: out/txt/
+# todo 需要覆写
 z_tile: 21
 
 # 2. infer para
-weight_path: /
-conf_path: /
-faster_rcnn_cmd_path: /
+CUDA_VISIBLE_DEVICES: 2     # imp
+weight_path: /home/yufeng/test-faster-rcnn/output/res101/voc_2007_trainval/default/res101_faster_rcnn_iter_190000.ckpt # imp
+conf_path: config.yaml
+faster_rcnn_cmd_path: /home/yufeng/test-faster-rcnn/ # imp
+stonebone: res101
+conf_thresh: 0.02
 # 3. tile2gps para
-result_txt_path: /
-result_lat_lon_npy_path: /
-result_lat_lon_txt_path: /
+result_txt_path: test_tree.txt
+result_lat_lon_npy_path: result_gps.npy
+result_lat_lon_txt_path: result_gps.txt
+batch: 5
